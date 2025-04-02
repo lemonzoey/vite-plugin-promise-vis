@@ -1,0 +1,23 @@
+{
+  "name": "vite-plugin-promise-vis",
+  "version": "1.0.0",
+  "description": "Vite插件：Promise可视化工具",
+  "type": "module",
+  "main": "vite-plugin-promise-vis.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "keywords": [
+    "vite-plugin",
+    "promise",
+    "visualization"
+  ],
+  "dependencies": {
+    "@babel/core": "^7.22.0",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "vite": "^4.3.9"
+  }
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Promise可视化示例</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .instruction {
+      background: #f0f0f0;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+    }
+
+    .button:hover {
+      opacity: 0.9;
+    }
+
+    .panel-button {
+      background: #2196F3;
+      display: block;
+      width: fit-content;
+    }
+
+    .test-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    button.button {
+      background: #607D8B;
+    }
+
+    button.button:hover {
+      background: #455A64;
+    }
+  </style>
+</head>
+<body>
+  <h1>Promise可视化示例</h1>
+  
+  <div class="instruction">
+    <h2>使用说明</h2>
+    <p>1. 点击下面的按钮打开可视化面板</p>
+    <p>2. 打开浏览器控制台(F12)查看Promise执行结果</p>
+    <p>3. 观察可视化面板中Promise的状态变化：</p>
+    <ul>
+      <li>橙色：等待中(pending)</li>
+      <li>绿色：完成(fulfilled)</li>
+      <li>红色：失败(rejected)</li>
+      <li>蓝色：链式调用完成</li>
+      <li>棕色：链式调用失败</li>
+      <li>浅蓝：错误恢复</li>
+    </ul>
+  </div>
+
+  <a href="/promise-panel" target="_blank" class="button panel-button">打开可视化面板</a>
+
+  <div class="instruction">
+    <h2>测试用例</h2>
+    <div class="test-buttons">
+      <button onclick="runExample1()" class="button">运行基础Promise链</button>
+      <button onclick="runExample2()" class="button">运行错误处理示例</button>
+      <button onclick="runExample3()" class="button">运行 Promise.all</button>
+      <button onclick="runExample4()" class="button">运行 Promise.race</button>
+      <button onclick="runExample5()" class="button">运行 async/await</button>
+      <button onclick="runExample6()" class="button">运行复杂链式调用</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { delay, simulateAPI } from '/src/main.js';
+    
+    window.runExample1 = () => {
+      // Example 1: Basic Promise chain
+      new Promise(resolve => {
+        setTimeout(() => resolve(1), 1000);
+      })
+      .then(v => v * 2)
+      .then(v => v + 1)
+      .then(console.log);
+    };
+
+    window.runExample2 = async () => {
+      // Example 2: Error handling and recovery
+      await new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Simulated error')), 1500);
+      })
+      .catch(e => {
+        console.warn('Recovered:', e.message);
+        return 'Recovered value';
+      })
+      .then(console.log);
+    };
+
+    window.runExample3 = async () => {
+      // Example 3: Parallel promises with Promise.all
+      const results = await Promise.all([
+        delay(2000).then(() => 'First'),
+        delay(1000).then(() => 'Second'),
+        delay(1500).then(() => 'Third')
+      ]);
+      console.log('All completed:', results);
+    };
+
+    window.runExample4 = async () => {
+      // Example 4: Race condition
+      const winner = await Promise.race([
+        delay(2000).then(() => 'Slow'),
+        delay(1000).then(() => 'Fast')
+      ]);
+      console.log('Race winner:', winner);
+    };
+
+    window.runExample5 = async () => {
+      // Example 5: Async/await with error handling
+      try {
+        const response = await simulateAPI();
+        console.log('API Success:', response);
+        
+        await delay(1000);
+        throw new Error('Subsequent error');
+      } catch (error) {
+        console.error('API Error:', error.message);
+      }
+    };
+
+    window.runExample6 = async () => {
+      // Example 6: Complex chaining
+      await new Promise(resolve => setTimeout(resolve, 500))
+        .then(() => simulateAPI())
+        .then(async (result) => {
+          await delay(800);
+          return { ...result, extra: 'data' };
+        })
+        .then(result => console.log('Complex chain result:', result))
+        .catch(console.error);
+    };
+  </script>
+</body>
+</html>
